@@ -1,6 +1,7 @@
 const myModal = new bootstrap.Modal("#register-modal");
 let logged = sessionStorage.getItem("logged");
 const session = localStorage.getItem("session");
+const chave = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 
 checkLogged();
 // LOGAR NO SISTEMA
@@ -67,7 +68,9 @@ function checkLogged() {
 }
 
 function saveAccount(data) {
-    localStorage.setItem(data.login, JSON.stringify(data));
+    const dataString = JSON.stringify(data);
+    const encryptedData = CryptoJS.AES.encrypt(dataString, chave).toString();
+    localStorage.setItem(data.login, encryptedData);
 }
 
 function saveSession(data, saveSession) {
@@ -78,11 +81,13 @@ function saveSession(data, saveSession) {
     sessionStorage.setItem("logged",data);
 }
 
-function getAccount(key) {
-    const account = localStorage.getItem(key)
+function getAccount(encryptedData) {
+    const account = localStorage.getItem(encryptedData)
+    const decryptedData = CryptoJS.AES.decrypt(account, chave).toString(CryptoJS.enc.Utf8);
 
-    if(account) {
-        return JSON.parse(account);
+
+    if(decryptedData) {
+        return JSON.parse(decryptedData);
     }
     return "";
 }
